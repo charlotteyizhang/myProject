@@ -16,16 +16,20 @@ var browserSync = require('browser-sync');
 /**
  * Using different folders/file names? Change these constants:
  */
-var PHASER_PATH = './node_modules/phaser/build/';
-var PUB_PATH = './dist';
-var SCRIPTS_PATH = PUB_PATH + '/scripts';
+
 var DEV_PATH = './build';
 var SOURCE_PATH = DEV_PATH + '/src';
 var STATIC_PATH = DEV_PATH + '/static';
 var SASS_PATH = DEV_PATH + '/scss';
 var IMG_PATH = DEV_PATH + '/static/images';
-var ENTRY_FILE = SOURCE_PATH + '/index.js';
-var OUTPUT_FILE = 'game.js';
+
+var ENTRY_FILE = SOURCE_PATH + '/main.js'; // where's the entry
+
+
+var PUB_PATH = './dist'; // here's where you publish the work to 
+var SCRIPTS_PATH = PUB_PATH + '/scripts'; // here's where you put your js files
+
+var OUTPUT_FILE = 'main.js';
 
 var keepFiles = false;
 
@@ -71,27 +75,6 @@ function cleanBuild() {
 function copyStatic() {
     return gulp.src(STATIC_PATH + '/**/*')
         .pipe(gulp.dest(PUB_PATH));
-}
-
-/**
- * Copies required Phaser files from the './node_modules/Phaser' folder into the './dist/scripts' folder.
- * This way you can call 'npm update', get the lastest Phaser version and use it on your project with ease.
- */
-function copyPhaser() {
-
-    var srcList = ['phaser.min.js'];
-    
-    if (!isProduction()) {
-        srcList.push('phaser.map', 'phaser.js');
-    }
-    
-    srcList = srcList.map(function(file) {
-        return PHASER_PATH + file;
-    });
-        
-    return gulp.src(srcList)
-        .pipe(gulp.dest(SCRIPTS_PATH));
-
 }
 
 /**
@@ -169,13 +152,13 @@ function buildSass() {
 
 gulp.task('cleanBuild', cleanBuild);
 gulp.task('copyStatic', ['cleanBuild'], copyStatic);
-gulp.task('copyPhaser', ['copyStatic'], copyPhaser);
-gulp.task('build', ['copyPhaser'], build);
+
+gulp.task('build', ['copyStatic'], build);
 gulp.task('fastBuild', build);
 gulp.task('serve', ['build', 'sass'], serve);
 gulp.task('watch-js', ['fastBuild'], browserSync.reload); // Rebuilds and reloads the project when executed.
 gulp.task('sass', buildSass);
-gulp.task('watch-static', ['copyPhaser'], browserSync.reload);
+gulp.task('watch-static', ['copyStatic'], browserSync.reload);
 
 /**
  * The tasks are executed in the following order:
